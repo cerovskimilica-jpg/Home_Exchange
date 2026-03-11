@@ -27,7 +27,6 @@ SELECT
     WHEN department = 'Saboya' THEN 'Savoie'
     WHEN department = 'Soma' THEN 'Somme'
     WHEN department = 'Rodano' THEN 'Rhône'
-    WHEN department = 'Rodano' THEN 'Rhône'
     ELSE department
   END AS department_clean
 FROM {{ ref('stg_raw_data__exchanges') }}  
