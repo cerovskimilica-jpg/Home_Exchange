@@ -1,9 +1,9 @@
--- Extraction des données des raw data de loc_touristic pour obtenir sur le nombre de nuitées par departement pour differentes années
+-- Extraction des données des raw data de loc_touristic pour obtenir sur le nombre de nuitées par departement pour differentes mois (year-month)
 
 WITH NUI_temp AS (
   SELECT *
   FROM {{ ref('stg_raw_data__loc_touristic') }}
-  WHERE FREQ = 'A' --  A pour année - OBS_VALUE_corrected est mesurée par an
+  WHERE FREQ = 'M' --  A pour année - OBS_VALUE_corrected est mesurée par an
     AND GEO_OBJECT = 'DEP' --  DEP pour departement - OBS_VALUE_corrected est mesurée par departement
     AND TOUR_MEASURE = 'NUI' -- TOUR_MEASURE = de qui est mesuré - NUI = nb de nuités
     AND OBS_STATUS_FR = 'D' --  D = version définitive
@@ -25,11 +25,13 @@ Dep_code AS (    -- ajout d'une colonne avec le code du département au bon form
 )
 
 SELECT 
-  TIME_PERIOD AS year,
+  TIME_PERIOD AS year_month,
+  CAST(SUBSTR(TIME_PERIOD, 1, 4) AS INT64) AS year,
+  CAST(SUBSTR(TIME_PERIOD, 6, 2) AS INT64) AS month,
   'France' AS country,
-  departement_code,
+  department_code,
   CONCAT('FR-', department_code) AS department_isocode, -- code ISO est utilisé pas Looker studio pour une heatmap Geo (country subdivision (1st level)
-  ROUND(SUM(OBS_VALUE_corrected), 0) AS nb_nights
+  ROUND(SUM(obs_value_corrected), 0) AS nb_nights
 FROM Dep_code
 GROUP BY TIME_PERIOD, department_code
 ORDER BY TIME_PERIOD DESC, nb_nights DESC

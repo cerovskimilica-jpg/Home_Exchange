@@ -44,4 +44,6 @@ multi AS (
 FROM renamed
 )
 
-select * from multi
+select *,
+    obs_value * multiplier AS obs_value_corrected
+from multi
