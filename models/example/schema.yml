@@ -8,5 +8,11 @@ sources:
       - name: exchanges
       - name: subscriptions
 
-        
-      
+models:
+  - name: clean_table
+    columns:
+      - name: country_clean
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['FRA', 'USA', 'SWE', 'PRT', 'REU', 'IDN', 'PRI', 'CYM', 'GLP', 'AND', 'CUW', 'SVN', 'SYC', 'FIN', 'JPN', 'DOM', 'GEO', 'COL', 'MTQ', 'TUR', 'NZL', 'LVA', 'AUS', 'JAM', 'LAO', 'PAN', 'VUT', 'NOR', 'ROU', 'SEN', 'SLV', 'TCA', 'MKD', 'BIH', 'MOZ', 'CUB', 'KHM', 'SJM', 'SPM', 'UGA', 'NPL', 'TZA', 'RWA', 'SRB', 'STP', 'SDN', 'NER', 'IRQ', 'CRI', 'THA']
