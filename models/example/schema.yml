@@ -7,6 +7,8 @@ sources:
     tables:
       - name: exchanges
       - name: subscriptions
+      - name: loc_touristic
+      - name: department_FR
 
 models:
   - name: clean_table
