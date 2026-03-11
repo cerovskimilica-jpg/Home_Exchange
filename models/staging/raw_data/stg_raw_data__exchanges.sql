@@ -116,6 +116,6 @@ SELECT * EXCEPT(region),
       THEN "Provence-Alpes-Côte d’Azur"
 
     ELSE region
-  END AS region_clean
+  END AS region
 
 FROM colonne
