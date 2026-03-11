@@ -26,7 +26,7 @@ with colonne as (
 
 )
     
-SELECT *,
+SELECT * EXCEPT(region),
   CASE
     WHEN region = 'Alsace-Champagne-Ardenne-Lorraine'
       THEN 'Grand Est'
@@ -120,4 +120,3 @@ SELECT *,
 
 FROM colonne
 WHERE region IS NOT NULL
-AND country = 'FRA'
