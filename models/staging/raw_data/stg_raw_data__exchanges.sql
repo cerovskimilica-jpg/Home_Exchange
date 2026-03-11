@@ -119,4 +119,3 @@ SELECT * EXCEPT(region),
   END AS region_clean
 
 FROM colonne
-WHERE region IS NOT NULL
