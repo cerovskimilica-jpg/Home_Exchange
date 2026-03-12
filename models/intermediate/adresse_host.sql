@@ -5,13 +5,13 @@ SELECT
 host_user_id, 
 last_subscription_date,
 residence_type,
-country, 
-region,
-department,
-city,
-FROM `home-exchange-489808.dbt_milica.sub_exchange` 
+country_host, 
+region_host,
+department_host,
+city_host,
+FROM {{ ref('sub_exchange') }}
 WHERE residence_type like "primary"
-GROUP BY host_user_id, last_subscription_date, residence_type, country, region, department, city
+GROUP BY host_user_id, last_subscription_date, residence_type, country_host, region_host, department_host, city_host
 )
 
 SELECT *
@@ -24,4 +24,4 @@ FROM (
         ) AS rn
     FROM adresse_host 
 ) x
-WHERE rn = 1;
+WHERE rn = 1
