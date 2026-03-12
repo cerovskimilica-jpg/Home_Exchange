@@ -45,7 +45,7 @@ SELECT
     country_guest, department_guest, region_guest, city_guest,
     country_guest2, department_guest2, region_guest2, city_guest2
   ),
-
+ 
   COALESCE(country_exc, country_sub) AS country_host,
   COALESCE(region_exc, region_sub) AS region_host,
   COALESCE(department_exc, department_sub) AS department_host,
