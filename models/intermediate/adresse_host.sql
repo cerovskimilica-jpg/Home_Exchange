@@ -21,7 +21,7 @@ FROM (
         ROW_NUMBER() OVER (
             PARTITION BY host_user_id
             ORDER BY last_subscription_date DESC
-        ) AS rn
+        ) AS row_number_def
     FROM adresse_host 
 ) x
-WHERE rn = 1
+WHERE row_number_def = 1
