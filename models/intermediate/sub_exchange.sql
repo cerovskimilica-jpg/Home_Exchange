@@ -22,7 +22,7 @@ WITH pro AS (
   FROM {{ ref('stg_raw_data__exchanges') }} AS s
   LEFT JOIN {{ ref('sub_no_duplicates') }} AS e
     ON e.user_id = s.host_user_id
-  LEFT JOIN {{ ref('sub_no_duplicates') }} AS sguest
+  LEFT JOIN {{ ref('stg_raw_data__subscriptions') }} AS sguest
     ON s.guest_user_id = sguest.user_id
 )
 
@@ -34,9 +34,9 @@ SELECT
     department_exc, department_sub
   ),
 
-  COALESCE(country_exc, country_sub) AS country_host,
-  COALESCE(region_exc, region_sub) AS region_host,
-  COALESCE(city_exc, city_sub) AS city_host,
-  COALESCE(department_exc, department_sub) AS department_host
+  COALESCE(country_exc, country_sub) AS country,
+  COALESCE(region_exc, region_sub) AS region,
+  COALESCE(city_exc, city_sub) AS city,
+  COALESCE(department_exc, department_sub) AS department
 
 FROM pro
