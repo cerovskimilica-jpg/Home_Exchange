@@ -24,7 +24,7 @@ WITH subscriptions_user AS (
     ANY_VALUE(department) AS department,
     ANY_VALUE(city) AS city
 
-  FROM {{ ref('stg_raw_data__subscriptions') }}
+  FROM {{ ref('stg_raw_data_subscriptions_category_clean') }}
   GROUP BY user_id
 )
 
