@@ -22,7 +22,7 @@ WITH pro AS (
   FROM {{ ref('stg_raw_data__exchanges') }} AS s
   LEFT JOIN {{ ref('sub_no_duplicates') }} AS e
     ON e.user_id = s.host_user_id
-  LEFT JOIN {{ ref('stg_raw_data__subscriptions') }} AS sguest
+  LEFT JOIN {{ ref('sub_no_duplicates') }} AS sguest
     ON s.guest_user_id = sguest.user_id
 )
 
