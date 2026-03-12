@@ -17,5 +17,5 @@ SELECT
     WHEN city = 'Salleb½uf' THEN 'Salleboeuf'
     ELSE city
   END AS city_clean
-FROM {{ ref('stg_raw_data__subscriptions') }}
+FROM {{ ref('stg_raw_data_subscriptions_category_clean') }}
 
