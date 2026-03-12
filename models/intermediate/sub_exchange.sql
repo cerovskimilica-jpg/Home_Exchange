@@ -2,6 +2,7 @@ WITH pro AS (
   SELECT
     s.* EXCEPT(country, region, city, department),
     e.* EXCEPT(country, region, city, department),
+    
 
     -- host
     s.country AS country_exc,
@@ -18,6 +19,7 @@ WITH pro AS (
     sguest.region AS region_guest,
     sguest.city AS city_guest,
     sguest.department AS department_guest
+   
 
   FROM {{ ref('stg_raw_data__exchanges') }} AS s
   LEFT JOIN {{ ref('sub_no_duplicates') }} AS e
@@ -33,10 +35,10 @@ SELECT
     city_exc, city_sub,
     department_exc, department_sub
   ),
-
+ 
   COALESCE(country_exc, country_sub) AS country_host,
   COALESCE(region_exc, region_sub) AS region_host,
-  COALESCE(city_exc, city_sub) AS city_host,
-  COALESCE(department_exc, department_sub) AS department_host
+  COALESCE(department_exc, department_sub) AS department_host,
+  COALESCE(city_exc, city_sub) AS city_host
 
 FROM pro
