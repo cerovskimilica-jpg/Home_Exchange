@@ -12,4 +12,4 @@ SELECT
     WHEN department_name = 'Alpes-de-Haute-Provence' THEN 'Alpes-De-Haute-Provence'
     ELSE department_name
   END AS department_clean
-FROM {{ ref('stg_raw_data__department_FR') }}
+FROM `home-exchange-489808.raw_data.department_FR`

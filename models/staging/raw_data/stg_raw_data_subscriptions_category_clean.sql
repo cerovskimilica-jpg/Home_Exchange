@@ -14,7 +14,7 @@ WITH temp1 AS (
         region,
         department,
         city
-    FROM {{ ref('stg_raw_data_subscriptions_category_clean') }}
+     FROM `home-exchange-489808.raw_data.subscriptions`
 )
 
 SELECT
