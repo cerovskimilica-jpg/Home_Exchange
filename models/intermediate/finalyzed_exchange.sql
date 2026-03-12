@@ -7,7 +7,7 @@
 
 WITH finalized_exchange as (
   SELECT *,
-  FROM {{ ref('sub_exchange') }}
+  FROM {{ ref('sub_exchanges_adresses') }}
   WHERE finalized_at is not null
 ),
 
