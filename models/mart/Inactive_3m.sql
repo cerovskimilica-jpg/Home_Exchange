@@ -78,7 +78,6 @@ exchange_activity AS (
     FROM users_last_sub AS u
     LEFT JOIN `home-exchange-489808.dbt_aengelke.sub_exchanges_adresses` AS s
         ON (u.user_id = s.guest_user_id OR u.user_id = s.host_user_id)
-    WHERE u.country_host = 'FRA'
     GROUP BY u.user_id, u.country_host, u.last_subscription, u.exchange_type
 )
 
