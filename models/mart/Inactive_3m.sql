@@ -112,4 +112,4 @@ SELECT
     END AS french_travel_abroad
 
 FROM exchange_activity
-ORDER BY last_subscription DESC;
+ORDER BY last_subscription DESC
