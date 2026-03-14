@@ -10,7 +10,7 @@ WITH clean AS (
 
 SELECT
 clean.*,
-attract.department_attractivity_cat AS department_host_attractivity_cat
+attract.department_attractivity_2022_decile AS department_attractivity_2022_decile
 FROM clean
 LEFT JOIN {{ ref('department_attractivity') }} AS attract
     ON clean.department_host_isocode = attract.department_isocode
