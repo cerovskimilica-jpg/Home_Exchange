@@ -1,8 +1,6 @@
--- Creation d'une table classant les departements en 3 categories d'attractivité.
--- Categorisation avec la methode des tercile (decoupage en 3 groupes egaux)
+-- Creation d'une table classant les departements categories d'attractivité (10 categories 10= attractif, 1 = pas attractif).
+-- Categorisation avec la methode des tercile (decoupage en 10 groupes egaux)
 -- en se basant sur le nombre de nuités de l'année 2022 (statistiques INSEE)
-
--- WITH decile_method AS (
 
 SELECT
     country,
