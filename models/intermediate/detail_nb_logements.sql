@@ -6,30 +6,52 @@ WITH base AS (
     country_host,
     city_host,
     capacity,
-    finalized_at,
 
-    -- Numérotation pour supprimer les doublons lorsque la capacity a été mal saisie (on garde la dernière ligne)
+    -- Numérotation pour supprimer les doublons lorsque la capacity a été mal saisie
     ROW_NUMBER() OVER (
       PARTITION BY user_id, residence_type, home_type, country_host, city_host
       ORDER BY user_id DESC
     ) AS rn
-  FROM {{ ref('sub_exchanges_adresses_HostisocodeFR') }}
+  FROM `home-exchange-489808.dbt_abrissiet.sub_exchanges_adresses_HostisocodeFR`
   WHERE user_id IS NOT NULL
     AND residence_type IS NOT NULL
     AND home_type IS NOT NULL
     AND country_host IS NOT NULL
     AND city_host IS NOT NULL
+),
+
+cleaned AS (
+  SELECT
+    *,
+    -- Nombre de résidences par type
+    COUNT(*) OVER (PARTITION BY user_id, residence_type) AS nb_residence_type,
+
+    -- Flags pour savoir si un user possède primary / secondary
+    MAX(CASE WHEN residence_type = 'primary' THEN 1 ELSE 0 END)
+      OVER (PARTITION BY user_id) AS has_primary,
+    MAX(CASE WHEN residence_type = 'secondary' THEN 1 ELSE 0 END)
+      OVER (PARTITION BY user_id) AS has_secondary
+  FROM base
+  WHERE rn = 1
 )
 
 SELECT
   user_id,
   residence_type,
+    -- Nouvelle colonne : catégorie du type de résidence
+  CASE
+    WHEN has_primary = 1 AND has_secondary = 0 THEN 'Only primary'
+    WHEN has_primary = 0 AND has_secondary = 1 THEN 'Only secondary'
+    WHEN has_primary = 1 AND has_secondary = 1 THEN 'Primary + Secondary'
+    ELSE 'Unknown'
+  END AS categorie_residence,
+
   home_type,
   country_host,
   city_host,
   capacity,
 
-  -- Nouvelle colonne de catégorisation de la capicité par logements
+  -- Catégorisation de la capacité
   CASE
     WHEN capacity = 1 THEN '1'
     WHEN capacity = 2 THEN '2'
@@ -39,9 +61,7 @@ SELECT
     ELSE 'Non renseigné'
   END AS capacity_category,
 
-  -- Nombre de résidences par type par user (exemple 2 si un user détient 2 résidence primary)
-  COUNT(*) OVER (PARTITION BY user_id, residence_type) AS nb_residence_type
+  nb_residence_type,
 
-FROM base
-WHERE rn = 1   -- On garde uniquement la dernière ligne pour chaque logement si doublon de lignes (hors capacity mal saisie = un meme logement avec plusieurs capacité saisie donc créé des doublons)
+FROM cleaned
 ORDER BY user_id
