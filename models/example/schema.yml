@@ -8,6 +8,8 @@ sources:
       - name: subscriptions
       - name: loc_touristic
       - name: department_FR
+      - name: dim_calendar_
+
 
 models:
   - name: clean_table
