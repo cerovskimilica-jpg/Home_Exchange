@@ -103,8 +103,7 @@ SELECT
 
   -- Catégorisation de la capacité
   CASE
-    WHEN capacity = 1 THEN '1'
-    WHEN capacity = 2 THEN '2'
+    WHEN capacity BETWEEN 1 AND 2 THEN '1-2'
     WHEN capacity BETWEEN 3 AND 5 THEN '3-5'
     WHEN capacity BETWEEN 6 AND 10 THEN '6-10'
     WHEN capacity > 10 THEN '10+'
