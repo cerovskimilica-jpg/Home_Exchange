@@ -82,11 +82,8 @@ churn_by_cancel_rate AS (
     cancel_rate_group
 )
 
-SELECT *
-FROM churn_by_cancel_rate
-ORDER BY
-  subscription_year,
-  CASE cancel_rate_group
+SELECT *,
+CASE cancel_rate_group
     WHEN 'no finalized exchange' THEN 1
     WHEN '0%' THEN 2
     WHEN '0-25%' THEN 3
@@ -94,4 +91,6 @@ ORDER BY
     WHEN '50-99%' THEN 5
     WHEN '100%' THEN 6
     ELSE 7
-  END
+  END AS cancel_rank,
+FROM churn_by_cancel_rate
+WHERE cancel_rate_group != 'unknown'

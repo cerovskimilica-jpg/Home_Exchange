@@ -19,5 +19,6 @@ select
     safe_divide(countif(renew = 0), count(*)) as churn_rate
 from {{ ref("stg_raw_data_subscriptions_category_clean") }}
 where renew is not null
+    AND country = 'FRA'
 group by tenure_bucket, referral
 order by tenure_bucket
