@@ -107,7 +107,7 @@ SELECT
     WHEN capacity = 2 THEN '2'
     WHEN capacity BETWEEN 3 AND 5 THEN '3-5'
     WHEN capacity BETWEEN 6 AND 10 THEN '6-10'
-    WHEN capacity > 10 THEN '+10'
+    WHEN capacity > 10 THEN '10+'
     ELSE 'Non renseigné'
   END AS capacity_category,
 
