@@ -17,6 +17,7 @@ WITH exchanges_cat AS (
       AND DATE(created_at) BETWEEN '2021-11-01' AND '2022-10-31'
 ),
 
+-- 1 cat par user = la plus récente observée
 user_latest_cat AS (
     SELECT
         guest_user_id,
@@ -35,6 +36,7 @@ user_latest_cat AS (
     WHERE rn = 1
 ),
 
+-- stats d'activité par guest
 user_activity AS (
     SELECT
         guest_user_id,
@@ -44,17 +46,19 @@ user_activity AS (
     GROUP BY guest_user_id
 ),
 
+-- renew + dernière inscription
 user_subscription AS (
     SELECT
         guest_user_id,
-        renew,
-        MAX(DATE(last_subscription_date)) AS last_subscription
+        MAX(DATE(last_subscription_date)) AS last_subscription,
+        renew
     FROM {{ ref('sub_exchanges_adresses_HostisocodeFR') }}
     WHERE guest_user_id IS NOT NULL
       AND last_subscription_date IS NOT NULL
     GROUP BY guest_user_id, renew
 ),
 
+-- activité dans les 3 mois après la dernière inscription
 user_inactive_3m AS (
     SELECT
         s.guest_user_id,
@@ -65,7 +69,7 @@ user_inactive_3m AS (
             ELSE 0
         END AS inactive_3m
     FROM user_subscription s
-    LEFT JOIN {{ ref('sub_exchanges_adresses_HostisocodeFR') }} a
+    LEFT JOIN {{ ref('sub_exchanges_adresses_HostisocodeFR') }} as a
         ON s.guest_user_id = a.guest_user_id
        AND a.created_at IS NOT NULL
        AND DATE(a.created_at) > s.last_subscription
@@ -80,7 +84,7 @@ final_user_level AS (
         a.nb_demandes,
         a.nb_echanges,
         SAFE_DIVIDE(a.nb_echanges, a.nb_demandes) AS finalisation,
-        s.renew,
+        renew,
         COALESCE(i.inactive_3m, 1) AS inactive_3m
     FROM user_latest_cat c
     LEFT JOIN user_activity a
@@ -92,18 +96,19 @@ final_user_level AS (
 )
 
 SELECT
-    guest_user_id,
+    
     cat,
-    COALESCE(nb_demandes, 0) AS nb_demandes,
-    COALESCE(nb_echanges, 0) AS nb_echanges,
-    ROUND(COALESCE(finalisation, 0), 4) AS taux_de_transformation,
-    CASE
-        WHEN renew = 0 THEN 1
-        ELSE 0
-    END AS churn,
-    CASE
-        WHEN renew = 1 THEN 1
-        ELSE 0
-    END AS total_renew,
-    inactive_3m
+    COUNT(*) AS total_users_in_cat,
+    ROUND(AVG(nb_demandes), 2) AS moy_nb_demandes,
+    ROUND(AVG(nb_echanges), 2) AS moy_nb_finalisees,
+    ROUND(SAFE_DIVIDE(AVG(nb_echanges), AVG(nb_demandes)), 2) AS taux_de_transformation,
+    ROUND(
+        SAFE_DIVIDE(
+            SUM(CASE WHEN renew = 0 THEN 1 ELSE 0 END),
+            COUNT(*)) * 100,2) AS churn,
+    COUNTIF(renew = 1) AS total_renew,
+    SUM(inactive_3m) AS total_inactive_3m,
+    ROUND(SAFE_DIVIDE(SUM(inactive_3m), COUNT(*)), 2) AS inactive_3m_rate
 FROM final_user_level
+GROUP BY cat
+ORDER BY cat
