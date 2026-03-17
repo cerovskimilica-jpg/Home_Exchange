@@ -110,6 +110,14 @@ SELECT
     ELSE 'Non renseigné'
   END AS capacity_category,
 
+  CASE
+    WHEN capacity BETWEEN 1 AND 2 THEN "1"
+    WHEN capacity BETWEEN 3 AND 5 THEN "2"
+    WHEN capacity BETWEEN 6 AND 10 THEN "3"
+    WHEN capacity > 10 THEN "4"
+    ELSE 'Non renseigné'
+  END AS capacity_category_rank,
+
   COUNT(*) OVER (PARTITION BY user_id, residence_type) AS nb_residence_type,
 
   -- Colonnes annuelles (demandes) - 
