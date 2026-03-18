@@ -1,7 +1,7 @@
 SELECT
   promotion,
   CASE
-    WHEN promotion = 0 THEN  "Sans Promotion"
+    WHEN promotion = 0 THEN  "Sans promotion"
     ELSE "Avec promotion"
   END AS promotion_graphe,
   COUNT(*) AS first_year_subscriptions,
