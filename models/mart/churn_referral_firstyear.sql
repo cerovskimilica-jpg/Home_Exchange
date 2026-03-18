@@ -1,8 +1,8 @@
 SELECT
   referral,
   CASE
-    WHEN referral = 0 THEN  "Non parrainé"
-    ELSE "Parrainé"
+    WHEN referral = 0 THEN  "Sans parrainage"
+    ELSE "Avec parrainage"
   END AS referral_graph,
   COUNT(*) AS first_year_subscriptions,
   COUNTIF(renew = 0) AS churned,
