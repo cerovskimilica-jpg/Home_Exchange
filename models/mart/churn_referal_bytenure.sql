@@ -4,16 +4,19 @@
 select
     case
         when date_diff(subscription_date, first_subscription_date, year) = 0
-        then 'Year 1'
+        then 'Année 1'
         when date_diff(subscription_date, first_subscription_date, year) = 1
-        then 'Year 2'
+        then 'Année 2'
         when date_diff(subscription_date, first_subscription_date, year) = 2
-        then 'Year 3'
+        then 'Année 3'
         when date_diff(subscription_date, first_subscription_date, year) = 3
-        then 'Year 4'
-        else 'Year 5+'
+        then 'Année 4'
+        else 'Année 5+'
     end as tenure_bucket,
-    referral,
+    CASE 
+    WHEN referral = 0 THEN "Sans parrainage"
+    ELSE "Avec parrainage"
+    END AS referral,
     count(*) as users,
     countif(renew = 0) as churners,
     safe_divide(countif(renew = 0), count(*)) as churn_rate
