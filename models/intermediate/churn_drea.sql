@@ -15,8 +15,8 @@ WITH exchanges_cat AS (
     WHERE guest_user_id IS NOT NULL
       AND guest_countguest_count IS NOT NULL
       AND guest_countguest_count >= 1
-      AND home_type IS NOT NULL              -- 👈 AJOUT
-      AND TRIM(home_type) != ''              -- 👈 AJOUT (sécurité)
+      AND home_type IS NOT NULL
+      AND TRIM(home_type) != ''
       AND DATE(created_at) BETWEEN '2021-11-01' AND '2022-10-31'
 ),
 
@@ -110,10 +110,10 @@ SELECT
             COUNT(*)
         ) * 100,
         2
-    ) AS churn,
+    ) AS churn_rate_pct,
     COUNTIF(renew = 1) AS total_renew,
     SUM(inactive_3m) AS total_inactive_3m,
-    ROUND(SAFE_DIVIDE(SUM(inactive_3m), COUNT(*)), 2) AS inactive_3m_rate
+    ROUND(SAFE_DIVIDE(SUM(inactive_3m), COUNT(*)) * 100, 2) AS inactive_3m_rate_pct
 FROM final_user_level
 GROUP BY cat, home_type
 ORDER BY cat, home_type
