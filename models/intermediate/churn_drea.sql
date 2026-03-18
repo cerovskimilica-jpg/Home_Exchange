@@ -53,11 +53,11 @@ user_subscription AS (
     SELECT
         guest_user_id,
         MAX(DATE(last_subscription_date)) AS last_subscription,
-        renew
+        MAX(renew) AS renew
     FROM {{ ref('sub_exchanges_adresses_HostisocodeFR') }}
     WHERE guest_user_id IS NOT NULL
       AND last_subscription_date IS NOT NULL
-    GROUP BY guest_user_id, renew
+    GROUP BY guest_user_id
 ),
 
 user_inactive_3m AS (
@@ -104,14 +104,9 @@ SELECT
     ROUND(AVG(nb_demandes), 2) AS moy_nb_demandes,
     ROUND(AVG(nb_echanges), 2) AS moy_nb_finalisees,
     ROUND(SAFE_DIVIDE(AVG(nb_echanges), AVG(nb_demandes)), 2) AS taux_de_transformation,
-    ROUND(
-        SAFE_DIVIDE(
-            SUM(CASE WHEN renew = 0 THEN 1 ELSE 0 END),
-            COUNT(*)
-        ) * 100,
-        2
-    ) AS churn_rate_pct,
     COUNTIF(renew = 1) AS total_renew,
+    COUNTIF(renew = 0) AS total_churn,
+    ROUND(SAFE_DIVIDE(COUNTIF(renew = 0), COUNT(*)) * 100, 2) AS churn_rate_pct,
     SUM(inactive_3m) AS total_inactive_3m,
     ROUND(SAFE_DIVIDE(SUM(inactive_3m), COUNT(*)) * 100, 2) AS inactive_3m_rate_pct
 FROM final_user_level
