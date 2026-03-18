@@ -53,11 +53,11 @@ user_subscription AS (
     SELECT
         guest_user_id,
         MAX(DATE(last_subscription_date)) AS last_subscription,
-        MAX(renew) AS renew
-    FROM {{ ref('sub_exchanges_adresses_HostisocodeFR') }}
+        `renew`
+    FROM {{ ref('sub_exchanges_adresses_HostisocodeFR') }} 
     WHERE guest_user_id IS NOT NULL
       AND last_subscription_date IS NOT NULL
-    GROUP BY guest_user_id
+    GROUP BY guest_user_id , `renew`
 ),
 
 user_inactive_3m AS (
