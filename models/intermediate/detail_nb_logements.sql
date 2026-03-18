@@ -90,9 +90,9 @@ SELECT
 
   -- Catégorie du type de résidence
   CASE
-    WHEN has_primary = 1 AND has_secondary = 0 THEN 'Only primary'
-    WHEN has_primary = 0 AND has_secondary = 1 THEN 'Only secondary'
-    WHEN has_primary = 1 AND has_secondary = 1 THEN 'Primary + Secondary'
+    WHEN has_primary = 1 AND has_secondary = 0 THEN 'Principale'
+    WHEN has_primary = 0 AND has_secondary = 1 THEN 'Secondaire'
+    WHEN has_primary = 1 AND has_secondary = 1 THEN 'Principale & Secondaire'
     ELSE 'Unknown'
   END AS categorie_residence,
 
