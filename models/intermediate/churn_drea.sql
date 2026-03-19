@@ -4,6 +4,7 @@ WITH exchanges_cat AS (
         created_at,
         finalized_at,
         guest_countguest_count,
+        INITCAP(TRIM(home_type)) AS home_type,
         CASE
             WHEN guest_countguest_count = 1 THEN '1 solo'
             WHEN guest_countguest_count = 2 THEN '2 couple'
@@ -14,18 +15,21 @@ WITH exchanges_cat AS (
     WHERE guest_user_id IS NOT NULL
       AND guest_countguest_count IS NOT NULL
       AND guest_countguest_count >= 1
+      AND home_type IS NOT NULL
+      AND TRIM(home_type) != ''
       AND DATE(created_at) BETWEEN '2021-11-01' AND '2022-10-31'
 ),
 
--- 1 cat par user = la plus récente observée
 user_latest_cat AS (
     SELECT
         guest_user_id,
-        cat
+        cat,
+        home_type
     FROM (
         SELECT
             guest_user_id,
             cat,
+            home_type,
             created_at,
             ROW_NUMBER() OVER (
                 PARTITION BY guest_user_id
@@ -36,7 +40,6 @@ user_latest_cat AS (
     WHERE rn = 1
 ),
 
--- stats d'activité par guest
 user_activity AS (
     SELECT
         guest_user_id,
@@ -46,19 +49,17 @@ user_activity AS (
     GROUP BY guest_user_id
 ),
 
--- renew + dernière inscription
 user_subscription AS (
     SELECT
         guest_user_id,
         MAX(DATE(last_subscription_date)) AS last_subscription,
-        renew
-    FROM {{ ref('sub_exchanges_adresses_HostisocodeFR') }}
+        `renew`
+    FROM {{ ref('sub_exchanges_adresses_HostisocodeFR') }} 
     WHERE guest_user_id IS NOT NULL
       AND last_subscription_date IS NOT NULL
-    GROUP BY guest_user_id, renew
+    GROUP BY guest_user_id , `renew`
 ),
 
--- activité dans les 3 mois après la dernière inscription
 user_inactive_3m AS (
     SELECT
         s.guest_user_id,
@@ -69,7 +70,7 @@ user_inactive_3m AS (
             ELSE 0
         END AS inactive_3m
     FROM user_subscription s
-    LEFT JOIN {{ ref('sub_exchanges_adresses_HostisocodeFR') }} as a
+    LEFT JOIN {{ ref('sub_exchanges_adresses_HostisocodeFR') }} AS a
         ON s.guest_user_id = a.guest_user_id
        AND a.created_at IS NOT NULL
        AND DATE(a.created_at) > s.last_subscription
@@ -80,11 +81,12 @@ user_inactive_3m AS (
 final_user_level AS (
     SELECT
         c.cat,
+        c.home_type,
         c.guest_user_id,
         a.nb_demandes,
         a.nb_echanges,
         SAFE_DIVIDE(a.nb_echanges, a.nb_demandes) AS finalisation,
-        renew,
+        s.renew,
         COALESCE(i.inactive_3m, 1) AS inactive_3m
     FROM user_latest_cat c
     LEFT JOIN user_activity a
@@ -96,19 +98,17 @@ final_user_level AS (
 )
 
 SELECT
-    
     cat,
+    home_type,
     COUNT(*) AS total_users_in_cat,
     ROUND(AVG(nb_demandes), 2) AS moy_nb_demandes,
     ROUND(AVG(nb_echanges), 2) AS moy_nb_finalisees,
     ROUND(SAFE_DIVIDE(AVG(nb_echanges), AVG(nb_demandes)), 2) AS taux_de_transformation,
-    ROUND(
-        SAFE_DIVIDE(
-            SUM(CASE WHEN renew = 0 THEN 1 ELSE 0 END),
-            COUNT(*)) * 100,2) AS churn,
     COUNTIF(renew = 1) AS total_renew,
+    COUNTIF(renew = 0) AS total_churn,
+    ROUND(SAFE_DIVIDE(COUNTIF(renew = 0), COUNT(*)) * 100, 2) AS churn_rate_pct,
     SUM(inactive_3m) AS total_inactive_3m,
-    ROUND(SAFE_DIVIDE(SUM(inactive_3m), COUNT(*)), 2) AS inactive_3m_rate
+    ROUND(SAFE_DIVIDE(SUM(inactive_3m), COUNT(*)) * 100, 2) AS inactive_3m_rate_pct
 FROM final_user_level
-GROUP BY cat
-ORDER BY cat
+GROUP BY cat, home_type
+ORDER BY cat, home_type
